@@ -18,6 +18,7 @@ const MySchema = () => {
     mrid: "rect_1",
     x: 100,
     y: 100,
+    child: [{}]
 
   },{
     mrid: "rect_2",
@@ -166,14 +167,43 @@ const MySchema = () => {
     const rect = svg.append("g")
       .selectAll()
       .data(rects.current)
-      .join("rect")
+      .join("g")
         .attr("id", d => d.mrid)
 				.attr("transform", d => "translate(" + d.x + "," + d.y + ")")
+        //.attr("width", 100)
+        //.attr("height", 100)
+
+    .append("rect")
         .attr("width", 100)
         .attr("height", 100)
         //.attr("x", d => d.x)
         //.attr("y", d => d.y)
 
+        .data(d => console.log(d))
+        .join("rect")
+.attr("width", 10)
+        .attr("height", 10)
+        .attr("x", 10)
+        .attr("y", 10)
+        .attr('fill', '#69a3b2');
+
+
+      /*rect.append("rect")
+        .attr("width", 10)
+        .attr("height", 10)
+        .attr("x", 10)
+        .attr("y", 10)
+        .attr('fill', '#69a3b2');
+
+
+      rect.append("rect")
+        .attr("width", 10)
+        .attr("height", 10)
+        .attr("x", 10)
+        .attr("y", 30)
+        .attr('fill', '#69a3b2');
+
+*/
         rect.call(d3.drag()
           .on("start", dragstarted)
           .on("drag", dragged)
@@ -206,6 +236,8 @@ const MySchema = () => {
         event.subject.y = event.y;
 
 		  d3.select("#" + event.subject.mrid).attr('transform', d => `translate(${event.subject.x},${event.subject.y})`);
+
+      console.log(d3.selectAll("path"))
 
 
 		  
@@ -324,8 +356,6 @@ const linkCoordinates = (link) => {
   return (
             <div>
               <svg id="schema" width={width} height={height} viewBox={[0, 0, width, height]} style={style}>
-
-                <g id="icons-electrical" />
 
               </svg>
             </div>
