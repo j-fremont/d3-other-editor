@@ -12,11 +12,56 @@ svg:not(.active):not(.ctrl) {
   cursor: crosshair;
 }
 
+
+
+
+
+rect.app {
+  fill: #F0B13B;
+  stroke: #A65F1B;
+  stroke-width: 2px;
+  rx: 5px;
+  ry: 5px;
+
+
+
+
+
+
+}
+
+text.apptext {
+
+  font-weight: bold;
+
+  
+  
+
+
+
+
+
+}
+
+
+rect.func {
+  fill: none;
+
+}
+
+
+text.functext {
+  fill: none;
+
+}
+
+
 path.link {
   fill: none;
   stroke: grey;
-  stroke-width: 4px;
+  stroke-width: 1px;
   cursor: default;
+
 }
 
 svg:not(.active):not(.ctrl) path.link {
