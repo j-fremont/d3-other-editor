@@ -25,18 +25,20 @@ const MySchema = () => {
       label: "Fonction_3",
       px: 100,
       py: 100,
-      x: 10,
-      y: 30,
+      xmin: 10,
+      xmax: 110,
+      y: 60,
 
     },{
       mrid: "rect_12",
       label: "ProcessResource_X",
       px: 100,
       py: 100,
-      x: 10,
-      y: 60,
+      xmin: 10,
+      xmax: 110,
+      y: 85,
 
-    },{
+    }/*,{
       mrid: "rect_13",
       label: "ProcessResource_Y",
       px: 100,
@@ -44,7 +46,7 @@ const MySchema = () => {
       x: 10,
       y: 90,
 
-    }]
+    }*/]
 
   },{
     mrid: "rect_2",
@@ -57,10 +59,11 @@ const MySchema = () => {
       label: "Fonction_1",
       px: 500,
       py: 100,
-      x: 10,
-      y: 30,
+      xmin: 10,
+      xmax: 110,
+      y: 60,
 
-    },{
+    }/*,{
       mrid: "rect_22",
       label: "ProcessResource_Z",
       px: 500,
@@ -68,9 +71,9 @@ const MySchema = () => {
       x: 10,
       y: 60,
 
-    }]
+    }*/]
 
-  },{
+  }/*,{
     mrid: "rect_3",
     label: "Application_C",
     x: 500,
@@ -94,25 +97,29 @@ const MySchema = () => {
 
     }]
 
-  }])
+  }*/])
 
   const links = useRef([{
+    mrid: "rect_12_rect_21",
     source: "rect_12",
     target: "rect_21",
 
-  },{
+  }/*,{
+    mrid: "rect_13_rect_31",
     source: "rect_13",
     target: "rect_31",
 
   },{
+    mrid: "rect_22_rect_11",
     source: "rect_22",
     target: "rect_11",
 
   },{
+    mrid: "rect_32_rect_21",
     source: "rect_32",
     target: "rect_21",
 
-  }])
+  }*/])
 
 
 
@@ -180,6 +187,16 @@ const MySchema = () => {
   useEffect(() => {
 
     console.log(rects.current)
+
+
+
+    const curve = d3.line().curve(d3.curveBasis);
+
+
+
+
+
+
 
     // Specify the color scale.
     //const color = d3.scaleOrdinal(d3.schemeCategory10);
@@ -283,20 +300,31 @@ rects.current.forEach(g => {
      const test = d3.select("#" + g.mrid).append("g")
      
      
-     test.append("rect")
+     /*test.append("rect")
       .attr('class', 'func')
         .attr("width", 150)
         .attr("height", 20)
-        .attr("x", c.x)
-        .attr("y", c.y)
-        .attr('fill', '#69a3b2')
+        .attr("x", c.xmin)
+        .attr("y", c.y+10)
+        .attr('fill', '#69a3b2')*/
 
+
+test.append("circle")
+      .attr('class', 'anchor')
+        .attr("r", 5)
+        .attr("cx", 0)
+        .attr("cy", c.y)
+        
+test.append("circle")
+      .attr('class', 'anchor')
+        .attr("r", 5)
+        .attr("cx", 200)
+        .attr("cy", c.y)
 
     test.append("text")
-          .attr('class', 'func')
-
-      .attr("dx", c.x+5)
-      .attr("dy", c.y+15)
+      .attr('class', 'func')
+      .attr("dx", 10)
+      .attr("dy", c.y+8)
       .text(c.label);
 
 
@@ -370,28 +398,162 @@ rects.current.forEach(g => {
 
       d3.selectAll("#paths path").filter(d => d.source===c.mrid).attr('d', d => {
 
-        const p = d3.select("path#" + d.source + "_" + d.target).attr("d");
+        /*const p = d3.select("path#" + d.source + "_" + d.target).attr("d");
         const l = p.split("L")[1];
-        const coo = l.split(",")
+        const coo = l.split(",")*/
 
-        const nx = event.subject.x + c.x;
-        const ny = event.subject.y + c.y;
+        let sx, sy;
 
-        return `M${nx},${ny}L${coo[0]},${coo[1]}`;
+        const link = links.current.find(l => l.mrid===d.mrid)
+
+        //const nx = event.subject.x + c.xmin;
+        //const ny = event.subject.y + c.y;
+
+        if ((event.subject.x+200) < link.points[3][0]) {
+
+          sx = event.subject.x + 200; // + c.xmax;
+          sy = event.subject.y + c.y;
+
+          link.points = [
+            [sx, sy],
+            [sx+50, sy],
+            link.points[2],
+            link.points[3]
+          ];
+
+        } else if (((event.subject.x+200) > link.points[3][0]) && ((event.subject.x+100) < (link.points[3][0]+100))) {
+
+          sx = event.subject.x; //+ c.xmin;
+          sy = event.subject.y + c.y;
+
+          link.points = [
+            [sx, sy],
+            [sx-50, sy],
+            link.points[2],
+            link.points[3]
+          ];
+
+        } else if ((event.subject.x) < (link.points[3][0]+200) && (event.subject.x+100) > (link.points[3][0]+100)){
+
+          sx = event.subject.x + 200;
+          sy = event.subject.y + c.y;
+
+          link.points = [
+            [sx, sy],
+            [sx+50, sy],
+            link.points[2],
+            link.points[3]
+            //[(link.points[2][0]+250), link.points[2][1]],
+            //[(link.points[3][0]+200), link.points[3][1]]
+          ];
+
+          console.log(link.points)
+
+        } else {
+          
+          
+          sx = event.subject.x;
+          sy = event.subject.y + c.y;
+
+          link.points = [
+            [sx, sy],
+            [sx-50, sy],
+            link.points[2],
+            link.points[3]
+            //[link.points[2][0]+250, link.points[2][1]],
+            //[link.points[3][0]+200, link.points[3][1]]
+          ];
+        }
+
+
+
+
+
+
+
+        //return `M${nx},${ny}L${coo[0]},${coo[1]}`;
+
+        
+
+        //link.points = [[nx, ny], link.points[1], link.points[2]];
+
+          /*link.points = [
+            [nx, ny],
+            pt2,
+            //[nx-50, ny],
+            //[c.targetX-50, c.targetY],
+            link.points[2],
+            link.points[3]
+          ];*/
+
+        return curve(link.points)
 
       });
 
 
       d3.selectAll("#paths path").filter(d => d.target===c.mrid).attr('d', d => {
 
-        const p = d3.select("path#" + d.source + "_" + d.target).attr("d");
+        /*const p = d3.select("path#" + d.source + "_" + d.target).attr("d");
         const l = p.split("L")[0].split("M")[1];
-        const coo = l.split(",")
+        const coo = l.split(",")*/
 
-        const nx = event.subject.x + c.x;
-        const ny = event.subject.y + c.y;
+        let tx, ty;
 
-        return `M${coo[0]},${coo[1]}L${nx},${ny}`;
+        const link = links.current.find(l => l.mrid===d.mrid)
+
+        //const nx = event.subject.x + c.xmin;
+        //const ny = event.subject.y + c.y;
+
+        if ((event.subject.x-200) < link.points[0][0]) {
+
+          tx = event.subject.x;
+          ty = event.subject.y + c.y;
+
+          link.points = [
+            link.points[0],
+            link.points[1],
+            [tx-50, ty],
+            [tx, ty]
+          ];
+
+          //pt3 = [nx+50, ny];
+
+        } else {
+
+          tx = event.subject.x; // + c.xmin;
+          ty = event.subject.y + c.y;
+
+          //pt3 = [nx-50, ny];
+
+          link.points = [
+            link.points[0],
+            link.points[1],
+            [tx-50, ty],
+            [tx, ty]
+          ];
+
+        }
+
+
+        //return `M${coo[0]},${coo[1]}L${nx},${ny}`;
+
+        //const link = links.current.find(l => l.mrid===d.mrid)
+
+        //link.points = [link.points[0], link.points[1], [nx, ny]];
+
+          /*link.points = [
+            link.points[0],
+            link.points[1],
+            [nx-50, ny],
+            //pt3,
+            [nx, ny]
+
+          ];*/
+
+
+        
+
+        return curve(link.points)
 
       });
 
@@ -463,9 +625,9 @@ const linkCoordinates = (link) => {
   const source = rects.current.flatMap(c => c.child).find(r => r.mrid===link.source);
   const target = rects.current.flatMap(c => c.child).find(r => r.mrid===link.target);
 
-	const sourceX = source.px + source.x;
+	const sourceX = source.px /*+ source.xmin*/;
 	const sourceY = source.py + source.y;
-	const targetX = target.px + target.x;
+	const targetX = target.px - 10/*+ target.xmin*/;
 	const targetY = target.py + target.y;
 
 	return {
@@ -485,13 +647,48 @@ const linkCoordinates = (link) => {
       .data(links.current)
       .join("path")
         .attr('class', 'link')
-        .attr("id", d => d.source + "_" + d.target)
+        .attr("id", d => d.mrid)
         .attr('marker-end', 'url(#arrow)')
         .attr('d', d => {
+
+          const c = linkCoordinates(d);
+          //const points=[[c.sourceX, c.sourceY], [c.sourceX-50, c.sourceY], [c.targetX-50, c.targetY], [c.targetX, c.targetY]];
+          //const points=[[c.sourceX, c.sourceY], [500, 500], [c.targetX, c.targetY]];
+
+
+          const points=[
+            [c.sourceX, c.sourceY],
+            [c.sourceX-50, c.sourceY],
+            [c.targetX-50, c.targetY],
+            [c.targetX, c.targetY]
+          ];
+
+
+          const link = links.current.find(l => l.mrid===d.mrid)
+
+          link.points = points;
+
+
+
+
+
+          return curve(link.points)
+
+          /*
           const c = linkCoordinates(d);
           return `M${c.sourceX},${c.sourceY}L${c.targetX},${c.targetY}`;
+          */
         })
 
+
+
+    /*    svg.append("text")
+   .append("textPath") //append a textPath to the text element
+    .attr("xlink:href", "#rect_32_rect_21") //place the ID of the path here
+    .style("text-anchor","middle") //place the text halfway on the arc
+    .attr("startOffset", "50%")
+    .text("Yay, my text is on a wavy path");
+*/
 
 
 
