@@ -17,25 +17,25 @@ const MySchema = () => {
   const rects = useRef([{
     mrid: "rect_1",
     label: "Application_A",
-    x: 100,
+    x: 500,
     y: 100,
 
     child: [{
       mrid: "rect_11",
       label: "Fonction_3",
-      px: 100,
+      px: 500,
       py: 100,
-      xmin: 10,
-      xmax: 110,
+
+      x: 200,
       y: 60,
 
     },{
       mrid: "rect_12",
       label: "ProcessResource_X",
-      px: 100,
+      px: 500,
       py: 100,
-      xmin: 10,
-      xmax: 110,
+
+      x: 200,
       y: 85,
 
     }/*,{
@@ -51,16 +51,16 @@ const MySchema = () => {
   },{
     mrid: "rect_2",
     label: "Application_B",
-    x: 500,
+    x: 100,
     y: 100,
 
     child: [{
       mrid: "rect_21",
       label: "Fonction_1",
-      px: 500,
+      px: 100,
       py: 100,
-      xmin: 10,
-      xmax: 110,
+
+      x: 600,
       y: 60,
 
     }/*,{
@@ -101,8 +101,8 @@ const MySchema = () => {
 
   const links = useRef([{
     mrid: "rect_12_rect_21",
-    source: "rect_12",
-    target: "rect_21",
+    mridSource: "rect_12",
+    mridTarget: "rect_21",
 
   }/*,{
     mrid: "rect_13_rect_31",
@@ -186,7 +186,6 @@ const MySchema = () => {
 
   useEffect(() => {
 
-    console.log(rects.current)
 
 
 
@@ -382,178 +381,188 @@ test.append("circle")
     // Update the subject (dragged node) position during drag.
     function dragged(event) {
 
-      //console.log(event)
-
-        event.subject.x = event.x;
-        event.subject.y = event.y;
+      event.subject.x = event.x;
+      event.subject.y = event.y;
 
 		  d3.select("#" + event.subject.mrid).attr('transform', d => `translate(${event.subject.x},${event.subject.y})`);
 
 
+
       event.subject.child.forEach(c => {
+        
+             
+        
+        
+        d3.selectAll("#paths path").filter(d => d.mridSource===c.mrid).attr('d', d => {
 
-        //console.log(c)
+
+          let x, y, points;
+
+          const link = links.current.find(l => l.mrid===d.mrid);
 
 
 
-      d3.selectAll("#paths path").filter(d => d.source===c.mrid).attr('d', d => {
+        if ((event.subject.x+200) < link.end.x) {
 
-        /*const p = d3.select("path#" + d.source + "_" + d.target).attr("d");
-        const l = p.split("L")[1];
-        const coo = l.split(",")*/
+          x = event.subject.x + 200;
+          y = event.subject.y + c.y;
 
-        let sx, sy;
-
-        const link = links.current.find(l => l.mrid===d.mrid)
-
-        //const nx = event.subject.x + c.xmin;
-        //const ny = event.subject.y + c.y;
-
-        if ((event.subject.x+200) < link.points[3][0]) {
-
-          sx = event.subject.x + 200; // + c.xmax;
-          sy = event.subject.y + c.y;
-
-          link.points = [
-            [sx, sy],
-            [sx+50, sy],
-            link.points[2],
-            link.points[3]
+          points = [
+            [x, y],
+            [x+50, y],
+            [link.end.x-50, link.end.y],
+            [link.end.x, link.end.y]
           ];
 
-        } else if (((event.subject.x+200) > link.points[3][0]) && ((event.subject.x+100) < (link.points[3][0]+100))) {
 
-          sx = event.subject.x; //+ c.xmin;
-          sy = event.subject.y + c.y;
+          
 
-          link.points = [
-            [sx, sy],
-            [sx-50, sy],
-            link.points[2],
-            link.points[3]
+        } else if (((event.subject.x+200) > link.end.x) && ((event.subject.x+100) < (link.end.x+100))) {
+
+          x = event.subject.x;
+          y = event.subject.y + c.y;
+
+          points = [
+            [x, y],
+            [x-50, y],
+            [link.end.x-50, link.end.y],
+            [link.end.x, link.end.y]
           ];
 
-        } else if ((event.subject.x) < (link.points[3][0]+200) && (event.subject.x+100) > (link.points[3][0]+100)){
 
-          sx = event.subject.x + 200;
-          sy = event.subject.y + c.y;
 
-          link.points = [
-            [sx, sy],
-            [sx+50, sy],
-            link.points[2],
-            link.points[3]
-            //[(link.points[2][0]+250), link.points[2][1]],
-            //[(link.points[3][0]+200), link.points[3][1]]
+
+        } else if ((event.subject.x < (link.end.x+200)) && ((event.subject.x+100) > (link.end.x+100))) {
+
+          x = event.subject.x + 200;
+          y = event.subject.y + c.y;
+
+
+          points = [
+            [x, y],
+            [x+50, y],
+            [link.end.x+270, link.end.y],
+            [link.end.x+220, link.end.y]
           ];
 
-          console.log(link.points)
+          
+
+
 
         } else {
           
           
-          sx = event.subject.x;
-          sy = event.subject.y + c.y;
+          x = event.subject.x;
+          y = event.subject.y + c.y;
 
-          link.points = [
-            [sx, sy],
-            [sx-50, sy],
-            link.points[2],
-            link.points[3]
-            //[link.points[2][0]+250, link.points[2][1]],
-            //[link.points[3][0]+200, link.points[3][1]]
+          points = [
+            [x, y],
+            [x-50, y],
+            [link.end.x+270, link.end.y],
+            [link.end.x+220, link.end.y]
           ];
         }
 
 
 
+                 link.start = {
+            x: event.subject.x -10 ,
+            y: event.subject.y + c.y
+          }
 
 
 
 
-        //return `M${nx},${ny}L${coo[0]},${coo[1]}`;
-
-        
-
-        //link.points = [[nx, ny], link.points[1], link.points[2]];
-
-          /*link.points = [
-            [nx, ny],
-            pt2,
-            //[nx-50, ny],
-            //[c.targetX-50, c.targetY],
-            link.points[2],
-            link.points[3]
-          ];*/
-
-        return curve(link.points)
+       return curve(points)
 
       });
 
 
-      d3.selectAll("#paths path").filter(d => d.target===c.mrid).attr('d', d => {
 
-        /*const p = d3.select("path#" + d.source + "_" + d.target).attr("d");
-        const l = p.split("L")[0].split("M")[1];
-        const coo = l.split(",")*/
 
-        let tx, ty;
 
-        const link = links.current.find(l => l.mrid===d.mrid)
 
-        //const nx = event.subject.x + c.xmin;
-        //const ny = event.subject.y + c.y;
 
-        if ((event.subject.x-200) < link.points[0][0]) {
+      d3.selectAll("#paths path").filter(d => d.mridTarget===c.mrid).attr('d', d => {
 
-          tx = event.subject.x;
-          ty = event.subject.y + c.y;
 
-          link.points = [
-            link.points[0],
-            link.points[1],
-            [tx-50, ty],
-            [tx, ty]
+
+        let x, y, points;
+
+        const link = links.current.find(l => l.mrid===d.mrid);
+
+        
+
+
+        if ((event.subject.x+200) < link.start.x) {
+
+          x = event.subject.x + 200;
+          y = event.subject.y + c.y;
+
+          points = [
+            [link.start.x, link.start.y],
+            [link.start.x-50, link.start.y],
+            [x+50, y],
+            [x+10, y]
+            
           ];
 
-          //pt3 = [nx+50, ny];
+        } else if (((event.subject.x+200) > link.start.x) && ((event.subject.x+100) < (link.start.x+100))) {
 
-        } else {
+          x = event.subject.x;
+          y = event.subject.y + c.y;
 
-          tx = event.subject.x; // + c.xmin;
-          ty = event.subject.y + c.y;
+          points = [
+            [link.start.x, link.start.y],
+            [link.start.x-50, link.start.y],
+            [x-50, y],
+            [x-10, y]
+          ];
 
-          //pt3 = [nx-50, ny];
 
-          link.points = [
-            link.points[0],
-            link.points[1],
-            [tx-50, ty],
-            [tx, ty]
+        } else if ((event.subject.x < (link.start.x+200)) && ((event.subject.x+100) > (link.start.x+100))) {
+
+          x = event.subject.x + 200;
+          y = event.subject.y + c.y;
+
+
+          points = [
+            [link.start.x+200, link.start.y],
+            [link.start.x+250, link.start.y],
+            [x+50, y],
+            [x+10, y]
+          ];
+
+
+         } else {
+          
+          
+          x = event.subject.x;
+          y = event.subject.y + c.y;
+
+          points = [
+            [link.start.x+200, link.start.y],
+            [link.start.x+250, link.start.y],
+            [x-50, y],
+            [x-10, y]
           ];
 
         }
 
 
-        //return `M${coo[0]},${coo[1]}L${nx},${ny}`;
-
-        //const link = links.current.find(l => l.mrid===d.mrid)
-
-        //link.points = [link.points[0], link.points[1], [nx, ny]];
-
-          /*link.points = [
-            link.points[0],
-            link.points[1],
-            [nx-50, ny],
-            //pt3,
-            [nx, ny]
-
-          ];*/
 
 
-        
+        link.end = {
+          x: event.subject.x,
+          y: event.subject.y + c.y
+        }
 
-        return curve(link.points)
+
+
+
+    
+
+        return curve(points)
 
       });
 
@@ -591,52 +600,19 @@ test.append("circle")
 const linkCoordinates = (link) => {
 
 
-  /*const source = rects.current.reduce((acc,v) => {
+  const source = rects.current.flatMap(c => c.child).find(r => r.mrid===link.mridSource);
+  const target = rects.current.flatMap(c => c.child).find(r => r.mrid===link.mridTarget);
 
-    const s = v.child.find(c => c.mrid===link.source);
-
-    if (s) {
-      acc = {
-        parent: v,
-        source: s
-      }
-    }
-
-    return acc;
-
-  }, {});*/
-
-  /*const target = rects.current.reduce((acc,v) => {
-
-    const t = v.child.find(c => c.mrid===link.target);
-
-    if (t) {
-      acc = {
-        parent: v,
-        target: t
-      }
-    }
-
-    return acc;
-
-  }, {});*/
-
-
-  const source = rects.current.flatMap(c => c.child).find(r => r.mrid===link.source);
-  const target = rects.current.flatMap(c => c.child).find(r => r.mrid===link.target);
-
-	const sourceX = source.px /*+ source.xmin*/;
+	const sourceX = source.px;
 	const sourceY = source.py + source.y;
-	const targetX = target.px - 10/*+ target.xmin*/;
+	const targetX = target.px - 10;
 	const targetY = target.py + target.y;
 
 	return {
 		sourceX,
 		sourceY,
 		targetX,
-		targetY,
-		//middleX: sourceX+((targetX-sourceX)/2),
-		//middleY: sourceY+((targetY-sourceY)/2)
+		targetY
 	}
 }
 
@@ -651,108 +627,68 @@ const linkCoordinates = (link) => {
         .attr('marker-end', 'url(#arrow)')
         .attr('d', d => {
 
-          const c = linkCoordinates(d);
-          //const points=[[c.sourceX, c.sourceY], [c.sourceX-50, c.sourceY], [c.targetX-50, c.targetY], [c.targetX, c.targetY]];
-          //const points=[[c.sourceX, c.sourceY], [500, 500], [c.targetX, c.targetY]];
+          //const c = linkCoordinates(d);
 
+          const source = rects.current.flatMap(c => c.child).find(r => r.mrid===d.mridSource);
+          const target = rects.current.flatMap(c => c.child).find(r => r.mrid===d.mridTarget);
+
+          const sourceX = source.px;
+          const sourceY = source.py + source.y;
+          const targetX = target.px - 10;
+          const targetY = target.py + target.y;
 
           const points=[
-            [c.sourceX, c.sourceY],
-            [c.sourceX-50, c.sourceY],
-            [c.targetX-50, c.targetY],
-            [c.targetX, c.targetY]
+            [sourceX, sourceY],
+            [sourceX-50, sourceY],
+            [targetX-50, targetY],
+            [targetX, targetY]
           ];
-
 
           const link = links.current.find(l => l.mrid===d.mrid)
 
-          link.points = points;
+          link.start = {
+            x: sourceX,
+            y: sourceY
+          }
+
+          link.end = {
+            x: targetX,
+            y: targetY
+          }
+
+          //return curve(link.points)
+          return curve(points)
 
 
-
-
-
-          return curve(link.points)
-
-          /*
-          const c = linkCoordinates(d);
-          return `M${c.sourceX},${c.sourceY}L${c.targetX},${c.targetY}`;
-          */
         })
 
 
-
-    /*    svg.append("text")
-   .append("textPath") //append a textPath to the text element
-    .attr("xlink:href", "#rect_32_rect_21") //place the ID of the path here
-    .style("text-anchor","middle") //place the text halfway on the arc
-    .attr("startOffset", "50%")
-    .text("Yay, my text is on a wavy path");
-*/
-
-
-
-
-
-
-
-
-
-
-
-    // When this cell is re-run, stop the previous simulation. (This doesn’t
-    // really matter since the target alpha is zero and the simulation will
-    // stop naturally, but it’s a good practice.)
-    //invalidation.then(() => simulation.stop());
-
-    //return svg.node();
 
   }, []);
 
 
 
-
-    
-
-   
-
-
-
-
-
-
-
-
   return (
-            <div>
-              <svg id="schema" width={width} height={height} viewBox={[0, 0, width, height]} style={style}>
+    <div>
+      <svg id="schema" width={width} height={height} viewBox={[0, 0, width, height]} style={style}>
+        <g id="icons" />
+        <g id="paths" />
+        <defs>
+          <marker
+            id="arrow"
+            viewBox="0 0 20 20"
+            refX="10"
+            refY="10"
+            markerWidth="12"
+            markerHeight="12"
+            orient="auto-start-reverse">
+              <path d="M 0 0 L 20 10 L 0 20 z" />
+          </marker>
+        </defs>
+      </svg>
+    </div>
+  )
+}
 
-
-							<g id="icons" />
-<g id="paths" />
-
-
-
-                <defs>
-                  <marker
-      id="arrow"
-      viewBox="0 0 20 20"
-      refX="10"
-      refY="10"
-      markerWidth="12"
-      markerHeight="12"
-      orient="auto-start-reverse">
-      <path d="M 0 0 L 20 10 L 0 20 z" />
-    </marker>
-                </defs>
-
-
-
-
-              </svg>
-            </div>
-    );
-  }
-
-  export default MySchema;
+export default MySchema;
 
