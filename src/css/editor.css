@@ -34,20 +34,22 @@ text.apptext {
 
   font-weight: bold;
 
-  
-  
+}
 
+text.functext {
 
+  font-style: normal;
 
+}
 
+text.prtext {
+
+  font-style: italic;
 
 }
 
 
-rect.func {
-  fill: none;
 
-}
 
 circle.anchor {
   fill: #A65F1B;
@@ -55,11 +57,6 @@ circle.anchor {
 }
 
 
-
-text.functext {
-  fill: none;
-
-}
 
 
 path.link {
