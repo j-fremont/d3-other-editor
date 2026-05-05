@@ -42,12 +42,23 @@ text.functext {
 
 }
 
+text.functext.selected {
+
+  fill: #C11007;
+  
+}
+
 text.prtext {
 
   font-style: italic;
 
 }
 
+text.prtext.selected {
+
+  fill: #C11007;
+  
+}
 
 
 
@@ -67,13 +78,21 @@ path.link {
 
 }
 
+
+path.link.selected {
+  stroke: #C11007;
+}
+
+
+
+
+
+
+
 svg:not(.active):not(.ctrl) path.link {
   cursor: pointer;
 }
 
-path.link.selected {
-  stroke:#0da9d9;
-}
 
 path.link.dragline {
   pointer-events: none;

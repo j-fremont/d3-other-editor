@@ -375,11 +375,35 @@ test.append("circle")
         .attr("cy", c.dy)
 
     test.append("text")
+      .attr('id', c.mrid)
       .attr('class', textType(c.type))
       .attr("dx", 10)
       .attr("dy", c.dy+8)
-      .text(c.label);
+      .text(c.label)
+      .on("click", e => {
 
+          d3.selectAll("#icons g g text").classed("selected", false);
+          d3.selectAll("#paths path").classed("selected", false);
+
+          d3.select(e.currentTarget).classed("selected", true);
+
+          d3.selectAll("#paths path").filter(d => d.mridSource===e.currentTarget.id).classed("selected", d => {
+
+            d3.select('#' + d.mridTarget).classed("selected", true);
+            
+            return true;
+          
+          });
+
+          d3.selectAll("#paths path").filter(d => d.mridTarget===e.currentTarget.id).classed("selected", d => {
+
+            d3.select('#' + d.mridSource).classed("selected", true);
+            
+            return true;
+          
+          });
+          
+        });
 
   })
 
@@ -604,6 +628,25 @@ test.append("circle")
           // Ou return curve(curvePointsOfLinkWithMovingTarget(link, link.end))
 
         })
+        .on("click", e => {
+
+          d3.selectAll("#paths path").classed("selected", false);
+
+          d3.select(e.currentTarget).classed("selected", true);
+
+
+
+
+         
+          
+          
+          
+        });
+
+
+
+
+
 
   }, []);
 
