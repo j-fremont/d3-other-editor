@@ -1,8 +1,6 @@
-import React, { useRef, useState, useEffect, useCallback } from 'react';
+import React, { useRef, useEffect } from 'react';
 import * as d3 from 'd3';
 import '../css/editor.css';
-
-//const data = require('../miserables.json');
 
 const style = {
   'max-width': '100%',
@@ -12,113 +10,13 @@ const style = {
 const width = 2400;
 const height = 1200;
 
+const WIDTH_APP = 200; // Largeur d'une application
+const HEIGHT_APP = 35; // Hauteur pour le nom d'une application
+const HEIGHT_FUNC = 25; // Hauteur pour le nom d'une fonction
+const HEIGHT_RES = 25; // Hauteur pour le nom d'un process resource
+const HEIGHT_SEP = 25; // Hauteur pour l'espce entre les fonctions et les process resources
+
 const MySchema = () => {
-
-  /*const rects = useRef([{
-    mrid: "rect_1",
-    label: "Application_A",
-    x: 100,
-    y: 100,
-
-    child: [{
-      mrid: "rect_11",
-      label: "Fonction_3",
-      x: 100,
-      y: 100,
-      dy: 50,
-
-    },{
-      mrid: "rect_12",
-      label: "ProcessResource_X",
-      x: 100,
-      y: 100,
-      dy: 90,
-
-    },{
-      mrid: "rect_13",
-      label: "ProcessResource_Y",
-      x: 100,
-      y: 100,
-      dy: 115
-
-    }]
-
-  },{
-    mrid: "rect_2",
-    label: "Application_B",
-    x: 500,
-    y: 100,
-
-    child: [{
-      mrid: "rect_21",
-      label: "Fonction_1",
-      x: 500,
-      y: 100,
-      dy: 50
-
-    },{
-      mrid: "rect_22",
-      label: "ProcessResource_Z",
-      x: 500,
-      y: 100,
-      dy: 90
-
-    }]
-
-  },{
-    mrid: "rect_3",
-    label: "Application_C",
-    x: 500,
-    y: 400,
-
-    child: [{
-      mrid: "rect_31",
-      label: "Fonction_2",
-      x: 500,
-      y: 400,
-      dy: 50
-
-    },{
-      mrid: "rect_33",
-      label: "Fonction_4",
-      x: 500,
-      y: 400,
-      dy: 75
-
-    },{
-      mrid: "rect_32",
-      label: "ProcessResource_W",
-      x: 500,
-      y: 400,
-      dy: 115
-
-    }]
-
-  }])
-
-  const links = useRef([{
-    mrid: "rect_12_rect_21",
-    mridSource: "rect_12",
-    mridTarget: "rect_21",
-
-  },{
-    mrid: "rect_13_rect_31",
-    mridSource: "rect_13",
-    mridTarget: "rect_31",
-
-  },{
-    mrid: "rect_22_rect_11",
-    mridSource: "rect_22",
-    mridTarget: "rect_11",
-
-  },{
-    mrid: "rect_32_rect_21",
-    mridSource: "rect_32",
-    mridTarget: "rect_21",
-
-  }])*/
-
-
 
 const rects = useRef([{
     mrid: "pwh",
@@ -343,14 +241,27 @@ const textType = (type) => {
 
     g.append("rect")
       .attr('class', 'app')
-        .attr("width", 200)
-        .attr("height", 200)
+        .attr("width", WIDTH_APP)
+        .attr("height", d => (
+            HEIGHT_APP +
+            HEIGHT_SEP +
+            d.child.filter(c => c.type==='function').length * HEIGHT_FUNC +
+            HEIGHT_SEP +
+            d.child.filter(c => c.type==='resource').length * HEIGHT_RES
+          ))
 
 g.append("text")
 .attr('class', 'apptext')
 .attr("dx", ".5em")
         .attr("dy", "1.2em")
     .text(d => d.label);
+
+
+    g.append("path")
+        .attr('class', 'separator')
+        .attr('d', d => {
+            return `M0,${HEIGHT_APP}L${WIDTH_APP},${HEIGHT_APP}`;
+          })
 
 
 rects.current.forEach(g => {
@@ -408,16 +319,23 @@ test.append("circle")
   })
 
 
-
-
-
-
-
-
-
 })
 
 
+d3.forceSimulation(rects.current)
+  .force('charge', d3.forceManyBody().strength(-50))
+  .force('center', d3.forceCenter(width/2, height/2))
+  .force('collision', d3.forceCollide().radius(75))
+  .on('tick', () => {
+    
+    d3.select("#icons").selectChildren("g").attr("transform", d => {
+
+      moveLinksOfApp(d);
+    
+      return "translate(" + d.x + "," + d.y + ")";
+  
+    })
+  })
 
 
     const dragstarted = (event) => {
@@ -541,25 +459,20 @@ test.append("circle")
       return points;
     }
 
-    const dragged = (event) => {
+    const moveLinksOfApp = (app) => {
 
-      event.subject.x = event.x;
-      event.subject.y = event.y;
-
-		  d3.select("#" + event.subject.mrid).attr('transform', d => `translate(${event.subject.x},${event.subject.y})`);
-
-      event.subject.child.forEach(c => {
+      app.child.forEach(c => {
         
         d3.selectAll("#paths path").filter(d => d.mridSource===c.mrid).attr('d', d => {
 
           const link = links.current.find(l => l.mrid===d.mrid);
 
           link.start = {
-            x: event.subject.x,
-            y: event.subject.y + c.dy
+            x: app.x,
+            y: app.y + c.dy
           }
           
-          return curve(curvePointsOfLinkWithMovingSource(link, event.subject, c.dy))
+          return curve(curvePointsOfLinkWithMovingSource(link, app, c.dy))
 
         })
       
@@ -568,14 +481,25 @@ test.append("circle")
           const link = links.current.find(l => l.mrid===d.mrid);
         
           link.end = {          
-            x: event.subject.x,
-            y: event.subject.y + c.dy
+            x: app.x,
+            y: app.y + c.dy
           }
         
-          return curve(curvePointsOfLinkWithMovingTarget(link, event.subject, c.dy))
+          return curve(curvePointsOfLinkWithMovingTarget(link, app, c.dy))
       
         })
       })
+    }
+
+    const dragged = (event) => {
+
+      event.subject.x = event.x;
+      event.subject.y = event.y;
+
+		  d3.select("#" + event.subject.mrid).attr('transform', d => `translate(${event.subject.x},${event.subject.y})`);
+
+      moveLinksOfApp(event.subject);
+     
     }
 
     const dragended = (event) => {
@@ -630,21 +554,20 @@ test.append("circle")
         })
         .on("click", e => {
 
+          d3.selectAll("#icons g g text").classed("selected", false);
           d3.selectAll("#paths path").classed("selected", false);
+          
 
           d3.select(e.currentTarget).classed("selected", true);
 
+          const link = links.current.find(l => l.mrid===e.currentTarget.id);
 
+          d3.select('#' + link.mridSource).classed("selected", true);
+          d3.select('#' + link.mridTarget).classed("selected", true);
 
-
-         
-          
-          
+        
           
         });
-
-
-
 
 
 

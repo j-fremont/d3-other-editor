@@ -85,7 +85,10 @@ path.link.selected {
 
 
 
-
+path.separator {
+  stroke: #A65F1B;
+  stroke-width: 1px;
+}
 
 
 
