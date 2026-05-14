@@ -240,7 +240,8 @@ const textType = (type) => {
 				.attr("transform", d => "translate(" + d.x + "," + d.y + ")")
 
     g.append("rect")
-      .attr('class', 'app')
+      .attr('class', 'app maximized')
+      .attr("id", d => d.mrid)
         .attr("width", WIDTH_APP)
         .attr("height", d => (
             HEIGHT_APP +
@@ -262,6 +263,51 @@ g.append("text")
         .attr('d', d => {
             return `M0,${HEIGHT_APP}L${WIDTH_APP},${HEIGHT_APP}`;
           })
+
+
+			g.append('g')
+      .attr("id", d => d.mrid)
+			.attr("transform", d => "translate(185,15)")
+.append("use").attr("xlink:href", "#minimize")
+.attr("id", d => d.mrid)
+.on("click", e => {
+
+            //d3.selectAll("#icons g rect.maximized").filter(d => d.mrid===e.currentTarget.id).attr("height", HEIGHT_APP).attr('class', 'app minimized')
+
+            const maximized = d3.select("rect#" + e.currentTarget.id + " .maximized");
+            const minimized = d3.select("rect#" + e.currentTarget.id + " .minimized");
+
+            console.log(maximized)
+            console.log(minimized)
+
+            if (maximized) {
+              maximized.attr("height", HEIGHT_APP).attr('class', 'app minimized')
+
+              d3.select("use#" + e.currentTarget.id).attr("xlink:href", "#maximize")
+
+            }
+
+            if (minimized) {
+              minimized.attr("height", 200).attr('class', 'app maximized')
+
+              d3.select("use#" + e.currentTarget.id).attr("xlink:href", "#minimize")
+
+            }
+
+
+
+          
+
+
+
+
+
+})
+
+
+
+
+
 
 
 rects.current.forEach(g => {
@@ -591,6 +637,15 @@ d3.forceSimulation(rects.current)
             orient="auto-start-reverse">
               <path d="M 0 0 L 20 10 L 0 20 z" />
           </marker>
+          <g id="minimize">
+            <circle r="10" className="button" />
+            <line x1="-4" y1="0" x2="4" y2="0" className="button" />
+          </g>
+          <g id="maximize">
+            <circle r="10" className="button" />
+            <line x1="-4" y1="0" x2="4" y2="0" className="button" />
+            <line x1="0" y1="-4" x2="0" y2="4" className="button" />
+          </g>
         </defs>
       </svg>
     </div>

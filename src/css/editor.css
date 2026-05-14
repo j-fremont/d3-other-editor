@@ -61,6 +61,18 @@ text.prtext.selected {
 }
 
 
+circle.button {
+  fill: #45556C;
+  cursor: pointer;
+
+}
+
+line.button {
+
+  stroke: #CAD5E2;
+  stroke-width: 2px;
+}
+
 
 circle.anchor {
   fill: #A65F1B;
