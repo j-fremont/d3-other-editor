@@ -268,12 +268,26 @@ g.append("text")
 			g.append('g')
       .attr("id", d => d.mrid)
 			.attr("transform", d => "translate(185,15)")
-.append("use").attr("xlink:href", "#minimize")
+.append("use").attr('class', 'minimize').attr("xlink:href", "#minimize")
 .attr("id", d => d.mrid)
 .on("click", e => {
 
-            //d3.selectAll("#icons g rect.maximized").filter(d => d.mrid===e.currentTarget.id).attr("height", HEIGHT_APP).attr('class', 'app minimized')
+          const maximized = d3.select("rect#" + e.currentTarget.id).filter(".maximized")
+          const minimized = d3.select("rect#" + e.currentTarget.id).filter(".minimized")
+          
+          maximized.attr("height", HEIGHT_APP).attr('class', 'app minimized')
+          minimized.attr("height", 200).attr('class', 'app maximized')
 
+          const maximize = d3.select("use#" + e.currentTarget.id).filter(".maximize")
+          const minimize = d3.select("use#" + e.currentTarget.id).filter(".minimize")
+
+          maximize.attr("xlink:href", "#minimize").attr('class', 'minimize')
+          minimize.attr("xlink:href", "#maximize").attr('class', 'maximize')
+
+ 
+          
+          //d3.selectAll("#icons g rect.maximized").filter(d => d.mrid===e.currentTarget.id).attr("height", HEIGHT_APP).attr('class', 'app minimized')
+/*
             const maximized = d3.select("rect#" + e.currentTarget.id + " .maximized");
             const minimized = d3.select("rect#" + e.currentTarget.id + " .minimized");
 
@@ -290,11 +304,11 @@ g.append("text")
             if (minimized) {
               minimized.attr("height", 200).attr('class', 'app maximized')
 
-              d3.select("use#" + e.currentTarget.id).attr("xlink:href", "#minimize")
+              //d3.select("use#" + e.currentTarget.id).attr("xlink:href", "#minimize")
 
             }
 
-
+*/
 
           
 
