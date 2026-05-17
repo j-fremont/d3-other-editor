@@ -42,6 +42,12 @@ text.functext {
 
 }
 
+text.functext.hide {
+
+  fill: none;
+
+}
+
 text.functext.selected {
 
   fill: #C11007;
@@ -53,6 +59,15 @@ text.prtext {
   font-style: italic;
 
 }
+
+text.prtext.hide {
+
+  fill: none;
+
+}
+
+
+
 
 text.prtext.selected {
 
@@ -78,6 +93,15 @@ circle.anchor {
   fill: #A65F1B;
 
 }
+
+
+circle.anchor.hide {
+
+  fill: none;
+
+}
+
+
 
 
 

@@ -18,7 +18,7 @@ const HEIGHT_SEP = 25; // Hauteur pour l'espce entre les fonctions et les proces
 
 const MySchema = () => {
 
-const rects = useRef([{
+  const rects = useRef([{
     mrid: "pwh",
     label: "HTA/Bay1/PWH",
     x: 100,
@@ -87,7 +87,6 @@ const rects = useRef([{
       x: 100,
       y: 100,
       dy: 115
-
     }]
 
   },{
@@ -213,24 +212,29 @@ const rects = useRef([{
     mridTarget: "pwh_depart",
   }])
 
+  const textType = (type) => {
 
-
-
-const textType = (type) => {
-
-  if (type==='function') return 'functext'
+    if (type==='function') return 'functext'
   
-  else return 'prtext'
+    else return 'prtext'
+  }
 
-}
+  const rectHeight = (d) => {
 
-
+    return (
+      HEIGHT_APP +
+      HEIGHT_SEP +
+      d.child.filter(c => c.type==='function').length * HEIGHT_FUNC +
+      HEIGHT_SEP +
+      d.child.filter(c => c.type==='resource').length * HEIGHT_RES
+    )
+  }
 
   useEffect(() => {
 
-    const curve = d3.line().curve(d3.curveBasis);
+    const curve = d3.line().curve(d3.curveBasis)
 
-    const svg = d3.select("#schema");
+    const svg = d3.select("#schema")
 
     const g = svg.select("#icons")
       .selectAll()
@@ -242,169 +246,131 @@ const textType = (type) => {
     g.append("rect")
       .attr('class', 'app maximized')
       .attr("id", d => d.mrid)
-        .attr("width", WIDTH_APP)
-        .attr("height", d => (
-            HEIGHT_APP +
-            HEIGHT_SEP +
-            d.child.filter(c => c.type==='function').length * HEIGHT_FUNC +
-            HEIGHT_SEP +
-            d.child.filter(c => c.type==='resource').length * HEIGHT_RES
-          ))
+      .attr("width", WIDTH_APP)
+      .attr("height", rectHeight)
 
-g.append("text")
-.attr('class', 'apptext')
-.attr("dx", ".5em")
-        .attr("dy", "1.2em")
-    .text(d => d.label);
-
+    g.append("text")
+      .attr('class', 'apptext')
+      .attr("dx", ".5em")
+      .attr("dy", "1.3em")
+      .text(d => d.label)
 
     g.append("path")
-        .attr('class', 'separator')
-        .attr('d', d => {
-            return `M0,${HEIGHT_APP}L${WIDTH_APP},${HEIGHT_APP}`;
-          })
+      .attr('class', 'separator')
+      .attr('d', d => `M0,${HEIGHT_APP}L${WIDTH_APP},${HEIGHT_APP}`)
 
-
-			g.append('g')
+		g.append('g')
       .attr("id", d => d.mrid)
 			.attr("transform", d => "translate(185,15)")
-.append("use").attr('class', 'minimize').attr("xlink:href", "#minimize")
-.attr("id", d => d.mrid)
-.on("click", e => {
+      .append("use").attr("xlink:href", "#minimize")
+        .attr("id", d => d.mrid)
+        .on("click", e => {
+
+          const app = rects.current.find(r => r.mrid===e.currentTarget.id)
 
           const maximized = d3.select("rect#" + e.currentTarget.id).filter(".maximized")
-          const minimized = d3.select("rect#" + e.currentTarget.id).filter(".minimized")
-          
-          maximized.attr("height", HEIGHT_APP).attr('class', 'app minimized')
-          minimized.attr("height", 200).attr('class', 'app maximized')
 
-          const maximize = d3.select("use#" + e.currentTarget.id).filter(".maximize")
-          const minimize = d3.select("use#" + e.currentTarget.id).filter(".minimize")
+          if (maximized.empty()) {
 
-          maximize.attr("xlink:href", "#minimize").attr('class', 'minimize')
-          minimize.attr("xlink:href", "#maximize").attr('class', 'maximize')
+            d3.select("rect#" + e.currentTarget.id).filter(".minimized").attr("height", rectHeight).attr("class", "app maximized")
 
- 
-          
-          //d3.selectAll("#icons g rect.maximized").filter(d => d.mrid===e.currentTarget.id).attr("height", HEIGHT_APP).attr('class', 'app minimized')
-/*
-            const maximized = d3.select("rect#" + e.currentTarget.id + " .maximized");
-            const minimized = d3.select("rect#" + e.currentTarget.id + " .minimized");
+            d3.select("use#" + e.currentTarget.id).attr("xlink:href", "#minimize")
 
-            console.log(maximized)
-            console.log(minimized)
+            d3.select("g#" + e.currentTarget.id).selectAll("text").filter(".prtext").attr("class", "prtext")
+            d3.select("g#" + e.currentTarget.id).selectAll("text").filter(".functext").attr("class", "functext")
 
-            if (maximized) {
-              maximized.attr("height", HEIGHT_APP).attr('class', 'app minimized')
+            d3.select("g#" + e.currentTarget.id).selectAll("circle").attr("class", "anchor")
 
-              d3.select("use#" + e.currentTarget.id).attr("xlink:href", "#maximize")
+            moveLinksOfApp(app)
 
-            }
+          } else {
 
-            if (minimized) {
-              minimized.attr("height", 200).attr('class', 'app maximized')
+            maximized.attr("height", HEIGHT_APP).attr("class", "app minimized")
 
-              //d3.select("use#" + e.currentTarget.id).attr("xlink:href", "#minimize")
+            d3.select("use#" + e.currentTarget.id).attr("xlink:href", "#maximize")
 
-            }
+            d3.select("g#" + e.currentTarget.id).selectAll("text").filter(".prtext").attr("class", "prtext hide")
+            d3.select("g#" + e.currentTarget.id).selectAll("text").filter(".functext").attr("class", "functext hide")
 
-*/
+            d3.select("g#" + e.currentTarget.id).selectAll("circle").attr("class", "anchor hide")
 
-          
+            moveLinksOfApp(app, true)
 
-
-
-
-
-})
-
-
-
-
-
-
-
-rects.current.forEach(g => {
-
-
-  g.child?.forEach(c => {
-
-
-     const test = d3.select("#" + g.mrid).append("g")
-     
-     
-test.append("circle")
-      .attr('class', 'anchor')
-        .attr("r", 5)
-        .attr("cx", 0)
-        .attr("cy", c.dy)
+          }
+        })
         
-test.append("circle")
-      .attr('class', 'anchor')
-        .attr("r", 5)
-        .attr("cx", 200)
-        .attr("cy", c.dy)
+    rects.current.forEach(r => {
+      
+      r.child?.forEach(c => {
+        
+        const f = d3.select("#" + r.mrid).append("g")
+        
+        f.append("circle")
+          .attr('class', 'anchor')
+          .attr("r", 5)
+          .attr("cx", 0)
+          .attr("cy", c.dy)
+        
+        f.append("circle")
+          .attr('class', 'anchor')
+          .attr("r", 5)
+          .attr("cx", 200)
+          .attr("cy", c.dy)
 
-    test.append("text")
-      .attr('id', c.mrid)
-      .attr('class', textType(c.type))
-      .attr("dx", 10)
-      .attr("dy", c.dy+8)
-      .text(c.label)
-      .on("click", e => {
+        f.append("text")
+          .attr('id', c.mrid)
+          .attr('class', textType(c.type))
+          .attr("dx", 10)
+          .attr("dy", c.dy+8)
+          .text(c.label)
+          .on("click", e => {
 
-          d3.selectAll("#icons g g text").classed("selected", false);
-          d3.selectAll("#paths path").classed("selected", false);
+            d3.selectAll("#icons g g text").classed("selected", false)
+            d3.selectAll("#paths path").classed("selected", false)
 
-          d3.select(e.currentTarget).classed("selected", true);
+            d3.select(e.currentTarget).classed("selected", true)
 
-          d3.selectAll("#paths path").filter(d => d.mridSource===e.currentTarget.id).classed("selected", d => {
+            d3.selectAll("#paths path").filter(d => d.mridSource===e.currentTarget.id).classed("selected", d => {
 
-            d3.select('#' + d.mridTarget).classed("selected", true);
+              d3.select('#' + d.mridTarget).classed("selected", true)
             
-            return true;
+              return true
           
-          });
+            });
 
-          d3.selectAll("#paths path").filter(d => d.mridTarget===e.currentTarget.id).classed("selected", d => {
+            d3.selectAll("#paths path").filter(d => d.mridTarget===e.currentTarget.id).classed("selected", d => {
 
-            d3.select('#' + d.mridSource).classed("selected", true);
+              d3.select('#' + d.mridSource).classed("selected", true)
             
-            return true;
+              return true
           
-          });
+            })
           
-        });
+          })
 
-  })
+      })
 
-
-})
-
-
-d3.forceSimulation(rects.current)
-  .force('charge', d3.forceManyBody().strength(-50))
-  .force('center', d3.forceCenter(width/2, height/2))
-  .force('collision', d3.forceCollide().radius(75))
-  .on('tick', () => {
-    
-    d3.select("#icons").selectChildren("g").attr("transform", d => {
-
-      moveLinksOfApp(d);
-    
-      return "translate(" + d.x + "," + d.y + ")";
-  
     })
-  })
 
+    d3.forceSimulation(rects.current)
+      .force('charge', d3.forceManyBody().strength(-50))
+      .force('center', d3.forceCenter(width/2, height/2))
+      .force('collision', d3.forceCollide().radius(75))
+      .on('tick', () => {
+    
+        d3.select("#icons").selectChildren("g").attr("transform", d => {
+
+          moveLinksOfApp(d);
+    
+          return "translate(" + d.x + "," + d.y + ")";
+  
+        })
+  
+      })
 
     const dragstarted = (event) => {
 
-
-
-
     }
-
 
     const curvePointsOfLinkWithMovingSource = (link, movingSource, dy=0) => {
       
@@ -462,7 +428,6 @@ d3.forceSimulation(rects.current)
       return points;
     }
 
-
     const curvePointsOfLinkWithMovingTarget = (link, movingTarget, dy=0) => {
 
       let x, y, points;
@@ -519,9 +484,11 @@ d3.forceSimulation(rects.current)
       return points;
     }
 
-    const moveLinksOfApp = (app) => {
+    const moveLinksOfApp = (app, minimized=false) => {
 
       app.child.forEach(c => {
+
+        const delta = minimized ? 18 : c.dy;
         
         d3.selectAll("#paths path").filter(d => d.mridSource===c.mrid).attr('d', d => {
 
@@ -529,10 +496,10 @@ d3.forceSimulation(rects.current)
 
           link.start = {
             x: app.x,
-            y: app.y + c.dy
+            y: app.y + delta //+ c.dy
           }
           
-          return curve(curvePointsOfLinkWithMovingSource(link, app, c.dy))
+          return curve(curvePointsOfLinkWithMovingSource(link, app, delta /*c.dy*/))
 
         })
       
@@ -542,10 +509,10 @@ d3.forceSimulation(rects.current)
         
           link.end = {          
             x: app.x,
-            y: app.y + c.dy
+            y: app.y + delta //+ c.dy
           }
         
-          return curve(curvePointsOfLinkWithMovingTarget(link, app, c.dy))
+          return curve(curvePointsOfLinkWithMovingTarget(link, app, delta /*c.dy*/))
       
         })
       })
@@ -558,25 +525,20 @@ d3.forceSimulation(rects.current)
 
 		  d3.select("#" + event.subject.mrid).attr('transform', d => `translate(${event.subject.x},${event.subject.y})`);
 
-      moveLinksOfApp(event.subject);
+      const maximized = d3.select("rect#" + event.subject.mrid).filter(".maximized")
+
+      moveLinksOfApp(event.subject, maximized.empty());
      
     }
 
     const dragended = (event) => {
 
-
-
     }
 
-
-        g.call(d3.drag()
-          .on("start", dragstarted)
-          .on("drag", dragged)
-          .on("end", dragended));
-
-
-
-
+    g.call(d3.drag()
+      .on("start", dragstarted)
+      .on("drag", dragged)
+      .on("end", dragended));
 
     svg.select("#paths")
       .selectAll()
@@ -616,7 +578,6 @@ d3.forceSimulation(rects.current)
 
           d3.selectAll("#icons g g text").classed("selected", false);
           d3.selectAll("#paths path").classed("selected", false);
-          
 
           d3.select(e.currentTarget).classed("selected", true);
 
@@ -624,16 +585,10 @@ d3.forceSimulation(rects.current)
 
           d3.select('#' + link.mridSource).classed("selected", true);
           d3.select('#' + link.mridTarget).classed("selected", true);
-
-        
           
         });
 
-
-
   }, []);
-
-
 
   return (
     <div>
