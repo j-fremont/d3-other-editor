@@ -94,6 +94,11 @@ circle.anchor {
 
 }
 
+path.anchor {
+  fill: #A65F1B;
+
+}
+
 
 circle.anchor.hide {
 
@@ -101,7 +106,11 @@ circle.anchor.hide {
 
 }
 
+path.anchor.hide {
 
+  fill: none;
+
+}
 
 
 

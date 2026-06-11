@@ -305,17 +305,25 @@ const MySchema = () => {
         
         const f = d3.select("#" + r.mrid).append("g")
         
-        f.append("circle")
+        /*f.append("circle")
           .attr('class', 'anchor')
           .attr("r", 5)
           .attr("cx", 0)
-          .attr("cy", c.dy)
-        
-        f.append("circle")
+          .attr("cy", c.dy)*/
+
+        f.append("path")
+          .attr('class', 'anchor')
+          .attr('d', d => `M 0 ${c.dy-5} A 5 5 0 1 1 0 ${c.dy+5} Z`)
+
+        /*f.append("circle")
           .attr('class', 'anchor')
           .attr("r", 5)
           .attr("cx", 200)
-          .attr("cy", c.dy)
+          .attr("cy", c.dy)*/
+
+        f.append("path")
+          .attr('class', 'anchor')
+          .attr('d', d => `M 200 ${c.dy-5} A 5 5 0 1 0 200 ${c.dy+5} Z`)
 
         f.append("text")
           .attr('id', c.mrid)
@@ -440,8 +448,10 @@ const MySchema = () => {
         points = [
           [link.start.x, link.start.y],
           [link.start.x-50, link.start.y],
-          [x+60, y],
-          [x+10, y]
+          [x+55, y],
+          [x+5, y]
+          //[x+60, y],
+          //[x+10, y]
         ];
       
       } else if ((movingTarget.x > link.start.x-200) && (movingTarget.x < link.start.x)) {
@@ -452,8 +462,10 @@ const MySchema = () => {
         points = [
           [link.start.x, link.start.y],
           [link.start.x-50, link.start.y],
-          [x-60, y],
-          [x-10, y]
+          [x-55, y],
+          [x-5, y]
+          //[x-60, y],
+          //[x-10, y]
         ];
       
       } else if ((movingTarget.x > link.start.x) && (movingTarget.x < link.start.x+200)) {
@@ -464,8 +476,10 @@ const MySchema = () => {
         points = [
           [link.start.x+200, link.start.y],
           [link.start.x+250, link.start.y],
-          [x+60, y],
-          [x+10, y]
+          [x+55, y],
+          [x+5, y]
+          //[x+60, y],
+          //[x+10, y]
         ];
       
       } else {
@@ -476,8 +490,10 @@ const MySchema = () => {
         points = [
           [link.start.x+200, link.start.y],
           [link.start.x+250, link.start.y],
-          [x-60, y],
-          [x-10, y]
+          [x-55, y],
+          [x-5, y]
+          //[x-60, y],
+          //[x-10, y]
         ];
       }
 
@@ -622,4 +638,6 @@ const MySchema = () => {
 }
 
 export default MySchema;
+
+// Commentaire ici...
 
